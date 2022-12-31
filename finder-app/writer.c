@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     FILE* file = fopen(filename, "w+"); 
     if (file == NULL)
     {
-        syslog(LOG_ERR, "Could not create %s, errno: %d: %s", filename, errno, strerror(errno));
+        syslog(LOG_ERR, "Could not create %s, errno: %d, %s", filename, errno, strerror(errno));
         return 1;
     }
     
