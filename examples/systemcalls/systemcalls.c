@@ -1,4 +1,10 @@
 #include "systemcalls.h"
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -17,7 +23,7 @@ bool do_system(const char *cmd)
  *   or false() if it returned a failure
 */
 
-    return true;
+    return !system(cmd);
 }
 
 /**
@@ -45,9 +51,6 @@ bool do_exec(int count, ...)
         command[i] = va_arg(args, char *);
     }
     command[count] = NULL;
-    // this line is to avoid a compile warning before your implementation is complete
-    // and may be removed
-    command[count] = command[count];
 
 /*
  * TODO:
@@ -59,9 +62,23 @@ bool do_exec(int count, ...)
  *
 */
 
-    va_end(args);
+    pid_t pid = fork();
+    if (pid == -1)
+        return false;
+    else if (pid == 0)
+    {   // child process executes execv()
+        execv(command[0], command);
+        exit(-1); // exit in case execv returns
+    }
 
-    return true;
+    int status;
+    if (wait(&status) == -1)
+        return false;
+    else if (WIFEXITED(status))
+        return WEXITSTATUS(status) == 0;
+
+    va_end(args);
+    return false;
 }
 
 /**
@@ -92,8 +109,34 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
+	int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    if (fd < 0)	
+        return false;
+
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        close(fd);
+        return false;
+    }
+    else if (pid == 0)
+    {   // child process
+        if (dup2(fd, 1)  == -1) // duplicate fd at desciptor 1, i.e everything written to 1 (stdout) is written to fd
+            exit(-1);
+        close(fd); 
+        execv(command[0], command);
+        exit(-1);
+    }
+
+    close(fd);
+
+    int status;
+    if (wait(&status) == -1)
+        return false;
+    else if (WIFEXITED(status))
+        return WEXITSTATUS(status) == 0;
 
     va_end(args);
 
-    return true;
+    return false;
 }
