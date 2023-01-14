@@ -69,13 +69,13 @@ then
 git clone git://busybox.net/busybox.git
     cd busybox
     git checkout ${BUSYBOX_VERSION}
-    make -j10 distclean
-    make -j10 defconfig
 else
     cd busybox
 fi
 
 # TODO: Config, make and install busybox
+make -j10 distclean
+make -j10 defconfig
 make -j10 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 make -j10 CONFIG_PREFIX=${OUTDIR}/rootfs/ ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 
