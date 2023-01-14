@@ -69,13 +69,13 @@ then
 git clone git://busybox.net/busybox.git
     cd busybox
     git checkout ${BUSYBOX_VERSION}
+    make -j10 distclean
+    make -j10 defconfig
 else
     cd busybox
 fi
 
 # TODO: Config, make and install busybox
-make -j10 distclean
-make -j10 defconfig
 make -j10 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 make -j10 CONFIG_PREFIX=${OUTDIR}/rootfs/ ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 
@@ -104,8 +104,9 @@ make CROSS_COMPILE=${CROSS_COMPILE}
 # on the target rootfs
 cp ${FINDER_APP_DIR}/writer ${OUTDIR}/rootfs/home/
 cp ${FINDER_APP_DIR}/finder-test.sh ${OUTDIR}/rootfs/home/
-mkdir -p ${OUTDIR}/rootfs/conf/
+mkdir -p ${OUTDIR}/rootfs/conf/ ${OUTDIR}/rootfs/home/conf/
 cp ${FINDER_APP_DIR}/../conf/username.txt ${OUTDIR}/rootfs/conf/
+cp ${FINDER_APP_DIR}/../conf/username.txt ${OUTDIR}/rootfs/home/conf/
 cp ${FINDER_APP_DIR}/autorun-qemu.sh ${OUTDIR}/rootfs/home/
 
 # TODO: Chown the root directory
