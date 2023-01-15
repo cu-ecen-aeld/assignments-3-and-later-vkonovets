@@ -5,4 +5,4 @@ writer : writer.c
 	$(CC) -o $@ $<
 
 clean:
-	rm writer
+	rm -rf writer

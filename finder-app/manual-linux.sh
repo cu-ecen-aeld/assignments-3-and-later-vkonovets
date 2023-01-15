@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Script outline to install and build kernel.
 # Author: Siddhant Jajoo.
 
@@ -11,7 +11,7 @@ KERNEL_VERSION=v5.1.10
 BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
 ARCH=arm64
-CROSS_COMPILE=aarch64-none-linux-gnu-
+CROSS_COMPILE=/usr/local/arm-cross-compiler/install/gcc-arm-10.2-2020.11-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
 
 if [ $# -lt 1 ]
 then
@@ -82,7 +82,7 @@ else
 fi
 
 make -j10 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
-make -j10 CONFIG_PREFIX=${OUTDIR}/rootfs/ ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
+sudo make -j10 CONFIG_PREFIX=${OUTDIR}/rootfs/ ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 
 cd ${OUTDIR}/rootfs
 echo "Library dependencies"
