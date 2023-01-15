@@ -23,7 +23,11 @@ fi
 
 OUTDIR=$(realpath $OUTDIR)
 if [ ! -d "$OUTDIR" ]; then
-    mkdir -p ${OUTDIR} && exit 1
+    mkdir -p ${OUTDIR} 
+    if [ ! $? -eq 0 ]; then
+        echo "mkdir failed"
+        exit 1
+    fi
 fi
 
 cd "$OUTDIR"
