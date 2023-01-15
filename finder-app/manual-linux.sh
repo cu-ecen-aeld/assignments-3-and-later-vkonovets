@@ -47,7 +47,7 @@ fi
 
 echo "Adding the Image in outdir"
 cd ${OUTDIR}
-cp linux-stable/arch/${ARCH}/boot/Image .
+cp ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ${OUTDIR}
 
 echo "Creating the staging directory for the root filesystem"
 cd "$OUTDIR"
@@ -69,14 +69,15 @@ then
 git clone git://busybox.net/busybox.git
     cd busybox
     git checkout ${BUSYBOX_VERSION}
+    #: TODO Configure and make busybox
+    make -j10 distclean
+    make -j10 defconfig
+    # TODO: Install busybox
+    make -j10 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 else
     cd busybox
 fi
 
-# TODO: Config, make and install busybox
-make -j10 distclean
-make -j10 defconfig
-make -j10 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 make -j10 CONFIG_PREFIX=${OUTDIR}/rootfs/ ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 
 cd ${OUTDIR}/rootfs
