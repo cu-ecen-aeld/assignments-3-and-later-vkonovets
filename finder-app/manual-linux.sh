@@ -77,11 +77,11 @@ git clone git://busybox.net/busybox.git
     make -j10 distclean
     make -j10 defconfig
     # TODO: Install busybox
-    make -j10 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 else
     cd busybox
 fi
 
+make -j10 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 make -j10 CONFIG_PREFIX=${OUTDIR}/rootfs/ ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 
 cd ${OUTDIR}/rootfs
@@ -90,6 +90,7 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "program interpreter"
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 
 # TODO: Add library dependencies to rootfs
+echo "Adding library dependencies"
 SYSROOT=$(${CROSS_COMPILE}gcc -print-sysroot)
 cp ${SYSROOT}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib/
 cp ${SYSROOT}/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64/
@@ -97,16 +98,19 @@ cp ${SYSROOT}/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64/
 cp ${SYSROOT}/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64/
 
 # TODO: Make device nodes
+echo "Making node devices"
 sudo mknod -m 666 dev/null c 1 3
 sudo mknod -m 600 dev/console c 5 1
 
 # TODO: Clean and build the writer utility
+echo "Compiling writer app"
 cd ${FINDER_APP_DIR}
 make clean
 make CROSS_COMPILE=${CROSS_COMPILE}
 
 # TODO: Copy the finder related scripts and executables to the /home directory
 # on the target rootfs
+echo "Copying writer/finder/conf and others"
 cp ${FINDER_APP_DIR}/writer ${OUTDIR}/rootfs/home/
 cp ${FINDER_APP_DIR}/finder-test.sh ${OUTDIR}/rootfs/home/
 mkdir -p ${OUTDIR}/rootfs/conf/ ${OUTDIR}/rootfs/home/conf/
@@ -115,10 +119,12 @@ cp ${FINDER_APP_DIR}/../conf/username.txt ${OUTDIR}/rootfs/home/conf/
 cp ${FINDER_APP_DIR}/autorun-qemu.sh ${OUTDIR}/rootfs/home/
 
 # TODO: Chown the root directory
+echo "Chowning rootfs"
 cd ${OUTDIR}/rootfs
 sudo chown -R root:root *
 
 # TODO: Create initramfs.cpio.gz
+echo "Creating initramfs"
 cd ${OUTDIR}/rootfs
 find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
 cd ${OUTDIR}
