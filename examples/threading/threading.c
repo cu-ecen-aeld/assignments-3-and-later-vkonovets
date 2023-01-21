@@ -74,19 +74,19 @@ bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int 
      * See implementation details in threading.h file comment block
      */
     
-    int rc = pthread_mutex_init(mutex, NULL);
+    struct thread_data* data = (struct thread_data*)malloc(sizeof(struct thread_data));
+    data->wait_to_obtain_ms = wait_to_release_ms;
+    data->wait_to_release_ms = wait_to_release_ms;
+    data->mutex = mutex;
+    data->thread_complete_success = false;
+
+    int rc = pthread_create(thread, NULL, threadfunc, data);
     if (rc != 0)
     {
-        printf("Attempt to pthread_mutex_init failed with %d\n.", rc);
+        printf("Attempt to pthread_create failed with %d\n.", rc);
         return false;
     }
     
-    // Write mutex pointer to struct only after it has been created
-    struct thread_data* data = (struct thread_data*)malloc(sizeof(struct thread_data));
-    data->wait_to_obtain_ms = wait_to_obtain_ms;
-    data->wait_to_release_ms = wait_to_release_ms;
-    data->mutex = mutex;
-
     return true;
 }
 
