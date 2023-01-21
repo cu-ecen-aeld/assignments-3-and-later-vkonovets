@@ -77,8 +77,6 @@ bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int 
     struct thread_data* data = (struct thread_data*)malloc(sizeof(struct thread_data));
     data->wait_to_obtain_ms = wait_to_release_ms;
     data->wait_to_release_ms = wait_to_release_ms;
-    data->thread = thread;
-    data->mutex = mutex;
 
     int rc = pthread_create(thread, NULL, threadfunc, data);
     if (rc != 0)
@@ -93,6 +91,9 @@ bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int 
         printf("Attempt to pthread_mutex_init failed with %d\n.", rc);
         return false;
     }
+
+    data->thread = thread;
+    data->mutex = mutex;
     
     return true;
 }
