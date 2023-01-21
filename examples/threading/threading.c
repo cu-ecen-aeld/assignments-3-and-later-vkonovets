@@ -17,12 +17,45 @@ void* threadfunc(void* thread_param)
     //struct thread_data* thread_func_args = (struct thread_data *) thread_param;
     struct thread_data* thread_func_args = (struct thread_data*)thread_param;
 
-    timespec req = {
+    struct timespec req = {
         .tv_sec = thread_func_args->wait_to_obtain_ms / 1000,
         .tv_nsec = (thread_func_args->wait_to_obtain_ms % 1000) * 1000000
     };
-    
+    struct timespec rem;
 
+    int rc = nanosleep(&req, &rem);
+    if (rc != 0)
+    {
+        printf("nanosleep call 1 failed with exit code %d.\n", rc);
+        thread_func_args->thread_complete_success = false;
+        return thread_param;
+    }
+    
+    rc = pthread_mutex_lock(thread_func_args->mutex);
+    if (rc != 0)
+    {
+        printf("pthread_mutex_lock failed with exit code %d.\n", rc);
+        thread_func_args->thread_complete_success = false;
+        return thread_param;
+    }
+
+    rc = nanosleep(&req, &rem);
+    if (rc != 0)
+    {
+        printf("nanosleep call 2 failed with exit code %d.\n", rc);
+        thread_func_args->thread_complete_success = false;
+        return thread_param;
+    }
+
+    rc = pthread_mutex_unlock(thread_func_args->mutex);
+    if (rc != 0)
+    {
+        printf("pthread_mutex_unlock failed with exit code %d.\n", rc);
+        thread_func_args->thread_complete_success = false;
+        return thread_param;
+    }
+
+    thread_func_args->thread_complete_success = true;
     return thread_param;
 }
 
@@ -38,15 +71,23 @@ bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int 
      * See implementation details in threading.h file comment block
      */
     
-    thread_data* data = (struct thread_data*)malloc(sizeof(struct thread_data));
+    struct thread_data* data = (struct thread_data*)malloc(sizeof(struct thread_data));
     data->wait_to_obtain_ms = wait_to_release_ms;
     data->wait_to_release_ms = wait_to_release_ms;
     data->thread = thread;
+    data->mutex = mutex;
 
     int rc = pthread_create(thread, NULL, threadfunc, data);
     if (rc != 0)
     {
         printf("Attempt to pthread_create failed with %d\n.", rc);
+        return false;
+    }
+
+    rc = pthread_mutex_init(mutex, NULL);
+    if (rc != 0)
+    {
+        printf("Attempt to pthread_mutex_init failed with %d\n.", rc);
         return false;
     }
     
