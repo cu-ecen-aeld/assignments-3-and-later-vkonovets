@@ -87,13 +87,6 @@ bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int 
     data->wait_to_release_ms = wait_to_release_ms;
     data->mutex = mutex;
 
-    rc = pthread_create(thread, NULL, threadfunc, data);
-    if (rc != 0)
-    {
-        printf("Attempt to pthread_create failed with %d\n.", rc);
-        return false;
-    }
-    
     return true;
 }
 
