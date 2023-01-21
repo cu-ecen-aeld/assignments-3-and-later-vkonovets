@@ -39,8 +39,8 @@ void* threadfunc(void* thread_param)
         return thread_param;
     }
 
-    req.tv_sec = thread_func_args->wait_to_release_ms / 1000,
-    req.tv_nsec = (thread_func_args->wait_to_release_ms % 1000) * 1000000
+    req.tv_sec = thread_func_args->wait_to_release_ms / 1000;
+    req.tv_nsec = (thread_func_args->wait_to_release_ms % 1000) * 1000000;
 
     rc = nanosleep(&req, &rem);
     if (rc != 0)
