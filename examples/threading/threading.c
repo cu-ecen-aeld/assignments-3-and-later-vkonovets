@@ -83,7 +83,7 @@ bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int 
     
     // Write mutex pointer to struct only after it has been created
     struct thread_data* data = (struct thread_data*)malloc(sizeof(struct thread_data));
-    data->wait_to_obtain_ms = wait_to_release_ms;
+    data->wait_to_obtain_ms = wait_to_obtain_ms;
     data->wait_to_release_ms = wait_to_release_ms;
     data->mutex = mutex;
 
