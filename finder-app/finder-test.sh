@@ -50,10 +50,6 @@ echo "Writing ${NUMFILES} files containing string ${WRITESTR} to ${WRITEDIR}"
  	fi
  fi
 
-echo "Removing the old writer utility and compiling as a native application"
-make clean
-make
-
 for i in $( seq 1 $NUMFILES)
 do
     ${FINDER_APP_DIR}/writer "$WRITEDIR/${username}$i.txt" "$WRITESTR"
