@@ -1,9 +1,9 @@
-#! /bin/bash
+#! /bin/sh
 
 case "$1" in
     start)
         echo "Starting aesdsocket"
-        start-stop-daemon -S -n aesdsocket -a /home/samokhvalov/Documents/Coursera/linux_system_programming/assignment-5-vkonovets-part1/server
+        start-stop-daemon -S -n aesdsocket -a /usr/bin/aesdsocket
         ;;
     stop)
         echo "Stopping aesdsocket"
